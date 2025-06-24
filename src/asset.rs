@@ -25,8 +25,8 @@ structstruck::strike! {
             #[serde(rename = "op")]
             Op {
                 counterparty: pub struct OpCounterparty {
-                    pub base_denom: String,
                     pub chain_name: String,
+                    pub base_denom: String,
                 },
                 chain: pub struct OpChain {
                     pub bridge_id: String,
@@ -55,6 +55,22 @@ pub struct AssetList {
     pub schema: String,
     pub chain_name: String,
     pub assets: Vec<Asset>,
+}
+
+impl Trace {
+    pub fn chain_name(&self) -> &str {
+        match self {
+            Trace::Op { counterparty, .. } => &counterparty.chain_name,
+            Trace::Ibc { counterparty, .. } => &counterparty.chain_name,
+        }
+    }
+
+    pub fn base_denom(&self) -> &str {
+        match self {
+            Trace::Op { counterparty, .. } => &counterparty.base_denom,
+            Trace::Ibc { counterparty, .. } => &counterparty.base_denom,
+        }
+    }
 }
 
 #[cfg(test)]
