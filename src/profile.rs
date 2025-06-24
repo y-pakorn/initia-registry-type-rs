@@ -29,9 +29,10 @@ structstruck::strike! {
         },
     }
 
-    #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, PartialOrd)]
-    pub struct ProfileList(pub Vec<Profile>);
 }
+
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, PartialOrd)]
+pub struct ProfileList(pub Vec<Profile>);
 
 #[cfg(test)]
 mod tests {
