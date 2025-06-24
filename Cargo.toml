@@ -1,0 +1,12 @@
+[package]
+name = "initia-registry-type-rs"
+version = "0.1.0"
+edition = "2024"
+
+[features]
+default = ["std"]
+std = ["serde/std"]
+
+[dependencies]
+serde = { version = "1.0.219", features = ["derive"], default-features = false }
+structstruck = "0.5.1"
