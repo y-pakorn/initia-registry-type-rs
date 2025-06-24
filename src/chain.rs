@@ -82,7 +82,7 @@ structstruck::strike! {
 }
 
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq, PartialOrd)]
-pub struct ChainList(Vec<Chain>);
+pub struct ChainList(pub Vec<Chain>);
 
 #[cfg(test)]
 mod tests {
