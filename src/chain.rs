@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use crate::common::ImageType;
+
 structstruck::strike! {
     #[structstruck::each[derive(Deserialize, Serialize, Clone, Debug, PartialEq, PartialOrd)]]
     pub struct Chain {
@@ -70,12 +72,7 @@ structstruck::strike! {
             }>,
         },
         #[serde(rename = "logo_URIs")]
-        pub logo_uris: pub enum LogoUris {
-            #[serde(rename = "png")]
-            PNG(String),
-            #[serde(rename = "svg")]
-            SVG(String),
-        },
+        pub logo_uris: ImageType,
         pub slip44: u32,
         pub bech32_prefix: String,
         pub network_type: String,

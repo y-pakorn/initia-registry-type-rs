@@ -19,7 +19,7 @@ structstruck::strike! {
         #[serde(default)]
         pub images: Vec<ImageType>,
         #[serde(rename = "logo_URIs")]
-        pub logo_uris: Vec<ImageType>,
+        pub logo_uris: ImageType,
         #[serde(default)]
         pub traces: Vec<#[serde(tag = "type")] pub enum Trace {
             #[serde(rename = "op")]
