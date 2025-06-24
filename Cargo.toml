@@ -10,3 +10,6 @@ std = ["serde/std"]
 [dependencies]
 serde = { version = "1.0.219", features = ["derive"], default-features = false }
 structstruck = "0.5.1"
+
+[dev-dependencies]
+serde_json = "1.0"
