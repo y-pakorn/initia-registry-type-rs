@@ -15,6 +15,7 @@ structstruck::strike! {
         pub name: String,
         pub symbol: String,
         pub coingecko_id: Option<String>,
+        pub type_asset: Option<String>,
         #[serde(default)]
         pub images: Vec<ImageType>,
         #[serde(rename = "logo_URIs")]
