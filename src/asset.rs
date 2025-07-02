@@ -44,6 +44,17 @@ structstruck::strike! {
                     pub path: String,
                 },
             },
+            #[serde(rename = "wrapped")]
+            Wrapped {
+                counterparty: pub struct WrappedCounterparty {
+                    pub chain_name: String,
+                    pub base_denom: String,
+                },
+                chain: pub struct WrappedChain {
+                    pub contract: String,
+                },
+                provider: String,
+            }
         }>
     }
 
@@ -62,6 +73,7 @@ impl Trace {
         match self {
             Trace::Op { counterparty, .. } => &counterparty.chain_name,
             Trace::Ibc { counterparty, .. } => &counterparty.chain_name,
+            Trace::Wrapped { counterparty, .. } => &counterparty.chain_name,
         }
     }
 
@@ -69,6 +81,7 @@ impl Trace {
         match self {
             Trace::Op { counterparty, .. } => &counterparty.base_denom,
             Trace::Ibc { counterparty, .. } => &counterparty.base_denom,
+            Trace::Wrapped { counterparty, .. } => &counterparty.base_denom,
         }
     }
 }
