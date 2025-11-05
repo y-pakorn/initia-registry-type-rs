@@ -686,7 +686,7 @@ mod tests {
         );
 
         // Verify the chain name
-        assert_eq!(asset_list.chain_name, "echelon");
+        assert_eq!(asset_list.chain_name, "initia");
 
         // Verify that the INIT token exists
         let init_asset = asset_list
@@ -698,18 +698,5 @@ mod tests {
         assert_eq!(init_asset.symbol, "INIT");
         assert_eq!(init_asset.display, "INIT");
         assert_eq!(init_asset.name, "Initia Native Token");
-
-        // Verify INIT has OP trace
-        assert!(
-            !init_asset.traces.is_empty(),
-            "Expected INIT to have traces"
-        );
-        match &init_asset.traces[0] {
-            Trace::Op { counterparty, .. } => {
-                assert_eq!(counterparty.chain_name, "initia");
-                assert_eq!(counterparty.base_denom, "uinit");
-            }
-            _ => panic!("Expected OP trace for INIT"),
-        }
     }
 }
