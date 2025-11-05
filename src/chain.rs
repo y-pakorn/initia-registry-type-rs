@@ -8,8 +8,8 @@ structstruck::strike! {
         pub chain_id: String,
         pub chain_name: String,
         pub pretty_name: String,
-        pub description: String,
-        pub website: String,
+        pub description: Option<String>,
+        pub website: Option<String>,
         pub fees: pub struct Fees {
             pub fee_tokens: Vec<pub struct FeeToken {
                 pub denom: String,
@@ -37,6 +37,8 @@ structstruck::strike! {
             pub json_rpc: Vec<Endpoint>,
             #[serde(rename = "json-rpc-websocket", default)]
             pub json_rpc_websocket: Vec<Endpoint>,
+            #[serde(default)]
+            pub indexer: Vec<Endpoint>,
         },
         pub explorers: Vec<pub struct Explorer {
             pub kind: String,
@@ -176,8 +178,8 @@ mod tests {
         assert_eq!(chain.chain_id, "interwoven-1");
         assert_eq!(chain.chain_name, "initia");
         assert_eq!(chain.pretty_name, "Initia");
-        assert_eq!(chain.description, "Initia Mainnet");
-        assert_eq!(chain.website, "https://initia.xyz");
+        assert_eq!(chain.description, Some("Initia Mainnet".to_string()));
+        assert_eq!(chain.website, Some("https://initia.xyz".to_string()));
         assert_eq!(chain.slip44, 60);
         assert_eq!(chain.bech32_prefix, "init");
         assert_eq!(chain.network_type, "mainnet");
@@ -397,8 +399,8 @@ mod tests {
             chain_id: "test-1".to_string(),
             chain_name: "test".to_string(),
             pretty_name: "Test Chain".to_string(),
-            description: "A test chain".to_string(),
-            website: "https://test.com".to_string(),
+            description: Some("A test chain".to_string()),
+            website: Some("https://test.com".to_string()),
             fees: Fees {
                 fee_tokens: vec![FeeToken {
                     denom: "utest".to_string(),
@@ -419,6 +421,7 @@ mod tests {
                 grpc: vec![],
                 json_rpc: vec![],
                 json_rpc_websocket: vec![],
+                indexer: vec![],
             },
             explorers: vec![Explorer {
                 kind: "test scan".to_string(),
@@ -584,5 +587,42 @@ mod tests {
         assert_eq!(endpoint.address, "https://test.com");
         assert_eq!(endpoint.provider, None);
         assert_eq!(endpoint.authorized_user, None);
+    }
+
+    #[tokio::test]
+    async fn test_fetch_and_parse_chains_json() {
+        let url = "https://registry.initia.xyz/chains.json";
+        let response = reqwest::get(url)
+            .await
+            .expect("Failed to fetch chains.json");
+
+        assert!(
+            response.status().is_success(),
+            "HTTP request failed with status: {}",
+            response.status()
+        );
+
+        let json_text = response.text().await.expect("Failed to read response body");
+
+        let chain_list: ChainList =
+            serde_json::from_str(&json_text).expect("Failed to parse chains.json");
+
+        // Verify that we got at least one chain
+        assert!(
+            !chain_list.0.is_empty(),
+            "Expected at least one chain in the response"
+        );
+
+        // Verify that the first chain (initia mainnet) has the expected structure
+        let initia_chain = chain_list
+            .0
+            .iter()
+            .find(|chain| chain.chain_id == "interwoven-1")
+            .expect("Expected to find initia mainnet chain");
+
+        assert_eq!(initia_chain.chain_id, "interwoven-1");
+        assert_eq!(initia_chain.chain_name, "initia");
+        assert_eq!(initia_chain.pretty_name, "Initia");
+        assert!(initia_chain.metadata.is_l1 == Some(true));
     }
 }

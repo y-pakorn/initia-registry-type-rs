@@ -660,4 +660,56 @@ mod tests {
 
         assert_eq!(asset_list, deserialized);
     }
+
+    #[tokio::test]
+    async fn test_fetch_and_parse_echelon_assetlist_json() {
+        let url = "https://registry.initia.xyz/chains/initia/assetlist.json";
+        let response = reqwest::get(url)
+            .await
+            .expect("Failed to fetch assetlist.json");
+
+        assert!(
+            response.status().is_success(),
+            "HTTP request failed with status: {}",
+            response.status()
+        );
+
+        let json_text = response.text().await.expect("Failed to read response body");
+
+        let asset_list: AssetList =
+            serde_json::from_str(&json_text).expect("Failed to parse assetlist.json");
+
+        // Verify that we got at least one asset
+        assert!(
+            !asset_list.assets.is_empty(),
+            "Expected at least one asset in the response"
+        );
+
+        // Verify the chain name
+        assert_eq!(asset_list.chain_name, "echelon");
+
+        // Verify that the INIT token exists
+        let init_asset = asset_list
+            .assets
+            .iter()
+            .find(|asset| asset.symbol == "INIT")
+            .expect("Expected to find INIT asset");
+
+        assert_eq!(init_asset.symbol, "INIT");
+        assert_eq!(init_asset.display, "INIT");
+        assert_eq!(init_asset.name, "Initia Native Token");
+
+        // Verify INIT has OP trace
+        assert!(
+            !init_asset.traces.is_empty(),
+            "Expected INIT to have traces"
+        );
+        match &init_asset.traces[0] {
+            Trace::Op { counterparty, .. } => {
+                assert_eq!(counterparty.chain_name, "initia");
+                assert_eq!(counterparty.base_denom, "uinit");
+            }
+            _ => panic!("Expected OP trace for INIT"),
+        }
+    }
 }
